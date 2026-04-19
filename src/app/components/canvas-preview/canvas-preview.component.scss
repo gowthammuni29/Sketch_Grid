@@ -1,0 +1,307 @@
+/* =============================================
+   SKETCH GRIDS — Canvas Preview Styles
+   3D floating canvas with holographic effects
+   ============================================= */
+
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,229,255,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 100%, rgba(168,85,247,0.04) 0%, transparent 50%),
+    var(--bg-base);
+
+  /* Grid dot pattern */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+}
+
+/* ── Toolbar ── */
+.preview__toolbar {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%),
+    rgba(10, 12, 20, 0.8);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+}
+
+.toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border-subtle);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
+.toolbar__info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.toolbar__label {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.toolbar__dim {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.tool-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all var(--dur-fast) var(--ease-smooth);
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--glass);
+    border-color: var(--border-subtle);
+  }
+
+  &:active { transform: scale(0.92); }
+
+  &--zoom {
+    min-width: 48px;
+    color: var(--text-secondary);
+    &:hover { color: var(--cyan); }
+  }
+
+  &--active {
+    background: var(--cyan-dim);
+    color: var(--cyan);
+    border-color: rgba(0,229,255,0.2);
+  }
+}
+
+/* ── Preview Area ── */
+.preview__area {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  cursor: default;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0,229,255,0.15);
+    border-radius: 3px;
+    &:hover { background: rgba(0,229,255,0.3); }
+  }
+}
+
+/* ── Rulers ── */
+.ruler {
+  position: absolute;
+  background: rgba(10,12,20,0.92);
+  z-index: 10;
+
+  &--h {
+    top: 0;
+    left: 24px;
+    right: 0;
+    height: 22px;
+    border-bottom: 1px solid var(--border-subtle);
+    overflow: hidden;
+  }
+
+  &--v {
+    top: 22px;
+    left: 0;
+    width: 24px;
+    bottom: 0;
+    border-right: 1px solid var(--border-subtle);
+    overflow: hidden;
+  }
+
+  &__tick {
+    position: absolute;
+
+    .ruler--h & {
+      top: 0;
+      height: 100%;
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    .ruler--v & {
+      left: 0;
+      width: 100%;
+      border-top: 1px solid var(--border-subtle);
+    }
+  }
+
+  &__label {
+    position: absolute;
+    font-family: var(--font-mono);
+    font-size: 7px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+
+    .ruler--h & { top: 2px; left: 3px; }
+    .ruler--v & { top: 2px; left: 2px; writing-mode: vertical-lr; transform: rotate(180deg); }
+  }
+}
+
+/* ── Canvas wrapper ── */
+.canvas-wrap {
+  position: relative;
+  transform-origin: center center;
+  transition: transform var(--dur-fast) var(--ease-smooth);
+
+  /* 3D float shadow layers */
+  filter:
+    drop-shadow(0 4px 8px rgba(0,0,0,0.5))
+    drop-shadow(0 12px 32px rgba(0,0,0,0.6))
+    drop-shadow(0 0 1px rgba(0,229,255,0.15));
+
+  &--rulers {
+    margin-top: 22px;
+    margin-left: 24px;
+  }
+
+  /* Hover: subtle 3D tilt */
+  &:hover {
+    filter:
+      drop-shadow(0 8px 16px rgba(0,0,0,0.55))
+      drop-shadow(0 20px 48px rgba(0,0,0,0.65))
+      drop-shadow(0 0 2px rgba(0,229,255,0.2));
+  }
+}
+
+/* Stacked shadow pages */
+.page-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  pointer-events: none;
+  z-index: -1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: rgba(14,17,32,0.9);
+    transform: translate(3px, 6px) rotate(0.3deg);
+  }
+
+  &--2::before {
+    background: rgba(14,17,32,0.6);
+    transform: translate(6px, 12px) rotate(0.6deg);
+  }
+}
+
+/* ── The Canvas ── */
+.grid-canvas {
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── CRT scan-line effect ── */
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.012) 2px,
+    rgba(0, 0, 0, 0.012) 4px
+  );
+  opacity: 0.4;
+}
+
+/* ── Status bar ── */
+.preview__statusbar {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  flex-shrink: 0;
+  background: rgba(6,8,16,0.95);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  &--warn .status-val { color: var(--amber); animation: statusWarn 1.5s ease infinite; }
+}
+
+.status-key {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 2px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.status-val {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.status-sep {
+  color: var(--text-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+@keyframes statusWarn {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}

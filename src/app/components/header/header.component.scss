@@ -1,0 +1,373 @@
+/* =============================================
+   SKETCH GRIDS — Header Styles
+   Holographic / 3D glass morphism header
+   ============================================= */
+
+.header {
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+
+  /* Layered 3D background */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.035) 0%, transparent 100%),
+    rgba(10, 12, 20, 0.95);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-bottom: 1px solid var(--border-subtle);
+
+  /* Bottom glow line */
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--cyan) 20%,
+      var(--violet-bright) 50%,
+      var(--cyan) 80%,
+      transparent 100%
+    );
+    opacity: 0.3;
+    animation: headerGlow 4s ease-in-out infinite;
+  }
+
+  /* Scan-line shimmer */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 229, 255, 0.02) 50%,
+      transparent 100%
+    );
+    animation: scanSweep 6s linear infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes headerGlow {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 0.5;  }
+}
+
+@keyframes scanSweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%);  }
+}
+
+/* ── Brand ── */
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* 3D Logo cube */
+.header__logo {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  perspective: 200px;
+  cursor: default;
+
+  &:hover .logo-3d {
+    animation: logoSpin 1s var(--ease-spring) forwards;
+  }
+}
+
+.logo-3d {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: logoFloat 4s ease-in-out infinite;
+  position: relative;
+}
+
+.logo-face {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+
+  &--front {
+    background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(168,85,247,0.15));
+    border: 1px solid rgba(0,229,255,0.35);
+    color: var(--cyan);
+    box-shadow:
+      0 0 20px rgba(0,229,255,0.2),
+      inset 0 1px 0 rgba(255,255,255,0.1),
+      inset 0 -1px 0 rgba(0,0,0,0.3);
+  }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+  25%       { transform: translateY(-2px) rotateX(3deg) rotateY(5deg); }
+  75%       { transform: translateY(1px) rotateX(-2deg) rotateY(-3deg); }
+}
+
+@keyframes logoSpin {
+  0%   { transform: rotateY(0deg);   }
+  100% { transform: rotateY(360deg); }
+}
+
+/* ── Title group ── */
+.header__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.header__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.title-sketch {
+  background: linear-gradient(135deg, #e8eaf0 0%, #a0aec0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-grids {
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--violet-bright) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-left: 2px;
+}
+
+.header__sub {
+  font-family: var(--font-mono);
+  font-size: 7px;
+  letter-spacing: 3px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* ── Info chips ── */
+.header__info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+}
+
+.info-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-normal);
+  background: var(--glass);
+  transition: all var(--dur-normal) var(--ease-smooth);
+
+  &__dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--emerald);
+    box-shadow: 0 0 6px var(--emerald);
+    animation: dotPulse 2s ease-in-out infinite;
+
+    &--warn {
+      background: var(--amber);
+      box-shadow: 0 0 6px var(--amber);
+    }
+  }
+
+  &__text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+  }
+
+  &--page .info-chip__text { color: var(--text-muted); }
+
+  &--alert {
+    border-color: rgba(255, 179, 0, 0.3);
+    background: rgba(255, 179, 0, 0.06);
+    animation: alertPulse 1.5s ease-in-out infinite;
+
+    .info-chip__text { color: var(--amber); }
+  }
+
+  &--warning {
+    border-color: rgba(255, 179, 0, 0.25);
+  }
+}
+
+.info-sep {
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes alertPulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 12px rgba(255,179,0,0.2); }
+}
+
+/* ── Actions ── */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Icon button */
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-normal);
+  background: var(--glass);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-smooth);
+
+  &:hover {
+    color: var(--cyan);
+    border-color: var(--border-bright);
+    background: var(--cyan-dim);
+    transform: rotate(-15deg);
+    box-shadow: var(--shadow-glow);
+  }
+
+  &:active { transform: rotate(-15deg) scale(0.92); }
+}
+
+/* Secondary button */
+.btn-secondary {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-normal);
+  background: var(--glass);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--dur-fast) var(--ease-smooth);
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--border-bright);
+    background: var(--cyan-dim);
+  }
+}
+
+/* Primary CTA button */
+.btn-primary {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--cyan), var(--violet-bright));
+  color: var(--bg-void);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--dur-fast) var(--ease-smooth);
+  box-shadow: 0 4px 16px rgba(0,229,255,0.25), 0 0 0 1px rgba(0,229,255,0.2);
+
+  /* Shine sweep */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    transition: left var(--dur-slow) var(--ease-smooth);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,229,255,0.4), 0 0 0 1px rgba(0,229,255,0.3);
+
+    &::before { left: 150%; }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0,229,255,0.2);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Success state */
+  &--success {
+    background: linear-gradient(135deg, var(--emerald), #00c78a);
+    box-shadow: 0 4px 16px rgba(0,255,179,0.25);
+    color: var(--bg-void);
+  }
+
+  /* Loading state */
+  &--loading {
+    pointer-events: none;
+  }
+}
+
+/* Loading spinner */
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: var(--bg-void);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

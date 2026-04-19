@@ -1,0 +1,220 @@
+/* ======================================================
+   SKETCH GRIDS — Global Styles
+   Futuristic 3D design system with holographic aesthetics
+   ====================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  /* Palette */
+  --bg-void:       #060810;
+  --bg-base:       #0a0c14;
+  --bg-raised:     #0e1120;
+  --bg-surface:    #131628;
+  --bg-elevated:   #181d30;
+
+  /* Neon accents */
+  --cyan:          #00e5ff;
+  --cyan-dim:      rgba(0, 229, 255, 0.12);
+  --cyan-glow:     rgba(0, 229, 255, 0.35);
+  --violet:        #7b5ea7;
+  --violet-bright: #a855f7;
+  --violet-dim:    rgba(168, 85, 247, 0.12);
+  --emerald:       #00ffb3;
+  --emerald-dim:   rgba(0, 255, 179, 0.1);
+  --amber:         #ffb300;
+  --amber-dim:     rgba(255, 179, 0, 0.12);
+  --rose:          #ff4d6d;
+
+  /* Text */
+  --text-primary:  #e8eaf0;
+  --text-secondary:#8b92a8;
+  --text-muted:    #4a5068;
+  --text-accent:   #00e5ff;
+
+  /* Borders */
+  --border-subtle:  rgba(255,255,255,0.05);
+  --border-normal:  rgba(255,255,255,0.09);
+  --border-bright:  rgba(0,229,255,0.25);
+
+  /* 3D / depth */
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.4);
+  --shadow-md:   0 8px 24px rgba(0,0,0,0.55);
+  --shadow-lg:   0 16px 48px rgba(0,0,0,0.7);
+  --shadow-xl:   0 32px 80px rgba(0,0,0,0.85);
+  --shadow-glow: 0 0 32px rgba(0,229,255,0.18), 0 0 8px rgba(0,229,255,0.1);
+  --shadow-violet-glow: 0 0 32px rgba(168,85,247,0.2);
+
+  /* Surfaces with depth */
+  --glass:       rgba(255,255,255,0.035);
+  --glass-hover: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.07);
+
+  /* Animation */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    150ms;
+  --dur-normal:  250ms;
+  --dur-slow:    400ms;
+
+  /* Layout */
+  --sidebar-w:   300px;
+  --header-h:    60px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+
+  /* Fonts */
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+  --font-body:    'Outfit', sans-serif;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-void);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  &:hover { background: rgba(0,229,255,0.25); }
+}
+
+/* ── Focus ── */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0,229,255,0.2);
+  color: var(--text-primary);
+}
+
+/* ── Global input resets ── */
+input, select, button, textarea {
+  font-family: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { display: none; }
+}
+
+input[type='color'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: none;
+  padding: 3px;
+  &::-webkit-color-swatch-wrapper { padding: 0; border-radius: 4px; }
+  &::-webkit-color-swatch { border: none; border-radius: 4px; }
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan-glow), 0 2px 4px rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: transform var(--dur-fast) var(--ease-spring),
+                box-shadow var(--dur-fast) var(--ease-smooth);
+
+    &:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: var(--cyan);
+    cursor: pointer;
+  }
+}
+
+/* ── Utility classes ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 3D Transform Utilities ── */
+.perspective-container {
+  perspective: 1200px;
+  perspective-origin: center;
+}
+
+/* ── Noise texture overlay ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px;
+}

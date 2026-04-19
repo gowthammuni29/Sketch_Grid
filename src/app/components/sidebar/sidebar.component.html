@@ -1,0 +1,552 @@
+<aside class="sidebar" role="complementary" aria-label="Grid controls">
+
+  <!-- ── Tab Navigation ── -->
+  <nav class="sidebar__tabs" role="tablist" aria-label="Control panels">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-btn"
+        [class.tab-btn--active]="activeTab() === tab.id"
+        role="tab"
+        [attr.aria-selected]="activeTab() === tab.id"
+        [attr.aria-controls]="'panel-' + tab.id"
+        (click)="setTab(tab.id)"
+      >
+        <span class="tab-btn__icon" [innerHTML]="tab.icon"></span>
+        <span class="tab-btn__label">{{ tab.label }}</span>
+        @if (activeTab() === tab.id) {
+          <span class="tab-btn__indicator" aria-hidden="true"></span>
+        }
+      </button>
+    }
+  </nav>
+
+  <!-- ── Panels ── -->
+  <div class="sidebar__content">
+
+    <!-- ════ GRID TAB ════ -->
+    <div
+      id="panel-grid"
+      class="panel"
+      [class.panel--active]="activeTab() === 'grid'"
+      role="tabpanel"
+      aria-label="Grid settings"
+    >
+      <!-- Page Size -->
+      <section class="section">
+        <h3 class="section__label">
+          <span class="section__label-text">Page</span>
+        </h3>
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label">Size</label>
+            <div class="select-wrap">
+              <select
+                class="select"
+                [value]="config().pageSize"
+                (change)="patch({ pageSize: selectVal($event) })"
+                aria-label="Page size"
+              >
+                <option value="a4">A4  (8.27×11.69")</option>
+                <option value="letter">Letter (8.5×11")</option>
+                <option value="a3">A3  (11.69×16.54")</option>
+                <option value="a5">A5  (5.83×8.27")</option>
+                <option value="square">Square (8×8")</option>
+                <option value="custom">Custom</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">›</span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label">Orientation</label>
+            <div class="toggle-pair">
+              <button
+                class="toggle-btn"
+                [class.toggle-btn--active]="config().orientation === 'portrait'"
+                (click)="patch({ orientation: 'portrait' })"
+                aria-label="Portrait orientation"
+                [attr.aria-pressed]="config().orientation === 'portrait'"
+              >↕ Port.</button>
+              <button
+                class="toggle-btn"
+                [class.toggle-btn--active]="config().orientation === 'landscape'"
+                (click)="patch({ orientation: 'landscape' })"
+                aria-label="Landscape orientation"
+                [attr.aria-pressed]="config().orientation === 'landscape'"
+              >↔ Land.</button>
+            </div>
+          </div>
+        </div>
+        @if (config().pageSize === 'custom') {
+          <div class="field-row">
+            <div class="field">
+              <label class="field__label" for="customW">Width (in)</label>
+              <input id="customW" class="input" type="number" min="2" max="24" step="0.1"
+                [value]="config().customWidthIn"
+                (input)="patch({ customWidthIn: numVal($event) })"
+                aria-label="Custom page width inches"
+              />
+            </div>
+            <div class="field">
+              <label class="field__label" for="customH">Height (in)</label>
+              <input id="customH" class="input" type="number" min="2" max="24" step="0.1"
+                [value]="config().customHeightIn"
+                (input)="patch({ customHeightIn: numVal($event) })"
+                aria-label="Custom page height inches"
+              />
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Columns & Rows -->
+      <section class="section">
+        <h3 class="section__label">
+          <span class="section__label-text">Grid</span>
+        </h3>
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="colsInput">Columns</label>
+            <div class="stepper">
+              <button class="stepper-btn" (click)="patch({ cols: clamp(config().cols - 1, 1, 50) })" aria-label="Decrease columns">−</button>
+              <input id="colsInput" class="input input--center" type="number" min="1" max="50"
+                [value]="config().cols"
+                (input)="patch({ cols: clamp(numVal($event), 1, 50) })"
+                aria-label="Number of columns"
+              />
+              <button class="stepper-btn" (click)="patch({ cols: clamp(config().cols + 1, 1, 50) })" aria-label="Increase columns">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="rowsInput">Rows</label>
+            <div class="stepper">
+              <button class="stepper-btn" (click)="patch({ rows: clamp(config().rows - 1, 1, 50) })" aria-label="Decrease rows">−</button>
+              <input id="rowsInput" class="input input--center" type="number" min="1" max="50"
+                [value]="config().rows"
+                (input)="patch({ rows: clamp(numVal($event), 1, 50) })"
+                aria-label="Number of rows"
+              />
+              <button class="stepper-btn" (click)="patch({ rows: clamp(config().rows + 1, 1, 50) })" aria-label="Increase rows">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="cellInput">
+            Cell Size — <span class="field__val">{{ config().cellIn }}"</span>
+          </label>
+          <input id="cellInput" type="range" min="0.25" max="3" step="0.25"
+            [value]="config().cellIn"
+            (input)="patch({ cellIn: numVal($event) })"
+            aria-label="Cell size in inches"
+            aria-valuemin="0.25" aria-valuemax="3"
+            [attr.aria-valuenow]="config().cellIn"
+          />
+          <div class="range-ticks" aria-hidden="true">
+            @for (v of cellTicks; track v) {
+              <span class="tick" [class.tick--active]="config().cellIn === v">{{ v }}"</span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Margins -->
+      <section class="section">
+        <h3 class="section__label">
+          <span class="section__label-text">Margins</span>
+        </h3>
+        <div class="field-row">
+          <div class="field">
+            <label class="field__label" for="marginSide">Side (in)</label>
+            <input id="marginSide" class="input" type="number" min="0" max="3" step="0.125"
+              [value]="config().marginSideIn"
+              (input)="patch({ marginSideIn: numVal($event) })"
+              aria-label="Side margin in inches"
+            />
+          </div>
+          <div class="field">
+            <label class="field__label" for="marginTop">Top/Bottom (in)</label>
+            <input id="marginTop" class="input" type="number" min="0" max="3" step="0.125"
+              [value]="config().marginTopIn"
+              (input)="patch({ marginTopIn: numVal($event) })"
+              aria-label="Top and bottom margin in inches"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Options -->
+      <section class="section">
+        <h3 class="section__label">
+          <span class="section__label-text">Options</span>
+        </h3>
+        <div class="toggle-list">
+          <label class="toggle-row">
+            <span class="toggle-row__label">Center grid on page</span>
+            <span class="toggle-switch" [class.toggle-switch--on]="config().centerGrid"
+              (click)="patch({ centerGrid: !config().centerGrid })"
+              role="switch" [attr.aria-checked]="config().centerGrid" tabindex="0"
+              (keydown.space)="patch({ centerGrid: !config().centerGrid })"
+            >
+              <span class="toggle-switch__thumb"></span>
+            </span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-row__label">Show corner guides</span>
+            <span class="toggle-switch" [class.toggle-switch--on]="config().showGuides"
+              (click)="patch({ showGuides: !config().showGuides })"
+              role="switch" [attr.aria-checked]="config().showGuides" tabindex="0"
+              (keydown.space)="patch({ showGuides: !config().showGuides })"
+            >
+              <span class="toggle-switch__thumb"></span>
+            </span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-row__label">Column numbers</span>
+            <span class="toggle-switch" [class.toggle-switch--on]="config().showColNumbers"
+              (click)="patch({ showColNumbers: !config().showColNumbers })"
+              role="switch" [attr.aria-checked]="config().showColNumbers" tabindex="0"
+              (keydown.space)="patch({ showColNumbers: !config().showColNumbers })"
+            >
+              <span class="toggle-switch__thumb"></span>
+            </span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-row__label">Row numbers</span>
+            <span class="toggle-switch" [class.toggle-switch--on]="config().showRowNumbers"
+              (click)="patch({ showRowNumbers: !config().showRowNumbers })"
+              role="switch" [attr.aria-checked]="config().showRowNumbers" tabindex="0"
+              (keydown.space)="patch({ showRowNumbers: !config().showRowNumbers })"
+            >
+              <span class="toggle-switch__thumb"></span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Stats Card -->
+      <section class="section">
+        <div class="stats-card">
+          <div class="stats-card__row">
+            <span class="stats-card__key">Page size</span>
+            <span class="stats-card__val">{{ pageDims().widthIn }}" × {{ pageDims().heightIn }}"</span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Grid size</span>
+            <span class="stats-card__val" [class.stats-card__val--warn]="!geom().fitsW || !geom().fitsH">
+              {{ geom().gridW.toFixed(2) }}" × {{ geom().gridH.toFixed(2) }}"
+            </span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Available</span>
+            <span class="stats-card__val">{{ geom().availW.toFixed(2) }}" × {{ geom().availH.toFixed(2) }}"</span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Total cells</span>
+            <span class="stats-card__val stats-card__val--accent">{{ config().cols * config().rows }}</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ════ LINES TAB ════ -->
+    <div
+      id="panel-lines"
+      class="panel"
+      [class.panel--active]="activeTab() === 'lines'"
+      role="tabpanel"
+      aria-label="Line settings"
+    >
+      <!-- Color + Width -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Line Style</span></h3>
+        <div class="field-row">
+          <div class="field field--color">
+            <label class="field__label" for="lineColor">Color</label>
+            <div class="color-wrap">
+              <input id="lineColor" type="color"
+                [value]="config().lineColor"
+                (input)="patch({ lineColor: strVal($event) })"
+                aria-label="Line color"
+              />
+              <span class="color-preview" [style.background]="config().lineColor"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field__label" for="lineWidth">Width (px)</label>
+            <input id="lineWidth" class="input" type="number" min="0.5" max="8" step="0.5"
+              [value]="config().lineWidth"
+              (input)="patch({ lineWidth: numVal($event) })"
+              aria-label="Line width in pixels"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="lineOpacity">
+            Opacity — <span class="field__val">{{ (config().lineOpacity * 100).toFixed(0) }}%</span>
+          </label>
+          <input id="lineOpacity" type="range" min="0.05" max="1" step="0.05"
+            [value]="config().lineOpacity"
+            (input)="patch({ lineOpacity: numVal($event) })"
+            aria-label="Line opacity" aria-valuemin="5" aria-valuemax="100"
+            [attr.aria-valuenow]="config().lineOpacity * 100"
+          />
+        </div>
+      </section>
+
+      <!-- Dash Style -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Dash Style</span></h3>
+        <div class="chip-group" role="group" aria-label="Line dash style">
+          @for (dash of dashOptions; track dash.id) {
+            <button
+              class="chip"
+              [class.chip--active]="config().lineDash === dash.id"
+              (click)="patch({ lineDash: dash.id })"
+              [attr.aria-pressed]="config().lineDash === dash.id"
+            >
+              <span class="dash-preview" [class]="'dash-preview--' + dash.id"></span>
+              {{ dash.label }}
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Presets -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Presets</span></h3>
+        <div class="preset-grid" role="group" aria-label="Line color presets">
+          @for (preset of colorPresets; track preset.label) {
+            <button
+              class="preset-btn"
+              [class.preset-btn--active]="config().lineColor === preset.color"
+              (click)="applyPreset(preset)"
+              [attr.aria-pressed]="config().lineColor === preset.color"
+              [attr.aria-label]="preset.label + ' preset'"
+            >
+              <span class="preset-btn__swatch" [style.background]="preset.color"
+                [style.box-shadow]="'0 0 8px ' + preset.color + '55'"></span>
+              <span class="preset-btn__label">{{ preset.label }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Background -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Background</span></h3>
+        <div class="field-row">
+          <div class="field field--color">
+            <label class="field__label" for="bgColor">Color</label>
+            <div class="color-wrap">
+              <input id="bgColor" type="color"
+                [value]="config().bgColor"
+                (input)="patch({ bgColor: strVal($event) })"
+                aria-label="Background color"
+              />
+              <span class="color-preview" [style.background]="config().bgColor"></span>
+            </div>
+          </div>
+          <div class="field" style="justify-content:flex-end; padding-top:18px;">
+            <label class="toggle-row">
+              <span class="toggle-row__label">Show bg</span>
+              <span class="toggle-switch" [class.toggle-switch--on]="config().showBg"
+                (click)="patch({ showBg: !config().showBg })"
+                role="switch" [attr.aria-checked]="config().showBg" tabindex="0"
+                (keydown.space)="patch({ showBg: !config().showBg })"
+              >
+                <span class="toggle-switch__thumb"></span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ════ IMAGE TAB ════ -->
+    <div
+      id="panel-image"
+      class="panel"
+      [class.panel--active]="activeTab() === 'image'"
+      role="tabpanel"
+      aria-label="Image overlay settings"
+    >
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Load Image</span></h3>
+        <div
+          class="dropzone"
+          [class.dropzone--dragging]="isDragging()"
+          [class.dropzone--loaded]="!!config().image"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="fileInput.click()"
+          role="button"
+          tabindex="0"
+          aria-label="Drop image or click to browse"
+          (keydown.enter)="fileInput.click()"
+          (keydown.space)="fileInput.click()"
+        >
+          <div class="dropzone__icon" aria-hidden="true">
+            @if (config().image) { 🖼 } @else { ⬆ }
+          </div>
+          <div class="dropzone__text">
+            @if (config().image) {
+              <strong>Image loaded</strong><br/>
+              <span>Click to replace</span>
+            } @else {
+              <strong>Drop or click to browse</strong><br/>
+              <span>JPG · PNG · WEBP · GIF · SVG</span>
+            }
+          </div>
+          <div class="dropzone__border" aria-hidden="true"></div>
+        </div>
+        <input #fileInput type="file" accept="image/*"
+          style="display:none"
+          (change)="onFileChange($event)"
+          aria-label="Image file input"
+        />
+        @if (imageMeta) {
+          <div class="img-thumb" role="img" [attr.aria-label]="imageMeta.name">
+            <img [src]="config().image!" [alt]="imageMeta.name" class="img-thumb__preview"/>
+            <div class="img-thumb__meta">
+              <span class="truncate">{{ imageMeta.name }}</span>
+              <span>{{ imageMeta.w }}×{{ imageMeta.h }} · {{ imageMeta.size }}kb</span>
+            </div>
+          </div>
+        }
+        @if (config().image) {
+          <button class="btn-ghost" (click)="removeImage()" aria-label="Remove image">
+            ✕ Remove Image
+          </button>
+        }
+      </section>
+
+      @if (config().image) {
+        <section class="section">
+          <h3 class="section__label"><span class="section__label-text">Fit Mode</span></h3>
+          <div class="fit-toggle" role="group" aria-label="Image fit mode">
+            @for (mode of fitModes; track mode.id) {
+              <button
+                class="fit-btn"
+                [class.fit-btn--active]="config().fitMode === mode.id"
+                (click)="patch({ fitMode: mode.id })"
+                [attr.aria-pressed]="config().fitMode === mode.id"
+              >{{ mode.label }}</button>
+            }
+          </div>
+          <p class="field-hint">{{ fitHint }}</p>
+        </section>
+
+        <section class="section">
+          <h3 class="section__label"><span class="section__label-text">Opacity</span></h3>
+          <div class="field">
+            <label class="field__label" for="imgOpacity">
+              Image opacity — <span class="field__val">{{ (config().imgOpacity * 100).toFixed(0) }}%</span>
+            </label>
+            <input id="imgOpacity" type="range" min="0.05" max="1" step="0.05"
+              [value]="config().imgOpacity"
+              (input)="patch({ imgOpacity: numVal($event) })"
+              aria-label="Image opacity"
+            />
+          </div>
+        </section>
+      }
+    </div>
+
+    <!-- ════ EXPORT TAB ════ -->
+    <div
+      id="panel-export"
+      class="panel"
+      [class.panel--active]="activeTab() === 'export'"
+      role="tabpanel"
+      aria-label="Export settings"
+    >
+      <!-- Format -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Format</span></h3>
+        <div class="chip-group" role="group" aria-label="Export file format">
+          @for (fmt of formats; track fmt.id) {
+            <button
+              class="chip chip--fmt"
+              [class.chip--active]="config().exportFormat === fmt.id"
+              (click)="patch({ exportFormat: fmt.id })"
+              [attr.aria-pressed]="config().exportFormat === fmt.id"
+              [title]="fmt.desc"
+            >
+              <span class="chip__badge">{{ fmt.id.toUpperCase() }}</span>
+            </button>
+          }
+        </div>
+        <p class="field-hint">{{ formatHint }}</p>
+      </section>
+
+      <!-- DPI -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Export DPI</span></h3>
+        <div class="dpi-grid" role="group" aria-label="Export DPI">
+          @for (opt of dpiOptions; track opt.value) {
+            <button
+              class="dpi-btn"
+              [class.dpi-btn--active]="config().exportDpi === opt.value"
+              (click)="patch({ exportDpi: opt.value })"
+              [attr.aria-pressed]="config().exportDpi === opt.value"
+              [attr.aria-label]="opt.value + ' DPI - ' + opt.hint"
+            >
+              <span class="dpi-btn__value">{{ opt.label }}</span>
+              <span class="dpi-btn__hint">{{ opt.hint }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="section">
+        <h3 class="section__label"><span class="section__label-text">Output Preview</span></h3>
+        <div class="stats-card stats-card--export">
+          <div class="stats-card__row">
+            <span class="stats-card__key">Page (px)</span>
+            <span class="stats-card__val">{{ exportSizes().pageW }} × {{ exportSizes().pageH }}</span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Grid (px)</span>
+            <span class="stats-card__val">{{ exportSizes().gridW }} × {{ exportSizes().gridH }}</span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Cell (px)</span>
+            <span class="stats-card__val">{{ exportSizes().cellPx }} × {{ exportSizes().cellPx }}</span>
+          </div>
+          <div class="stats-card__row">
+            <span class="stats-card__key">Format</span>
+            <span class="stats-card__val stats-card__val--accent">
+              {{ config().exportFormat.toUpperCase() }} · {{ config().exportDpi }} DPI
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Export CTA -->
+      <section class="section section--cta">
+        <button
+          class="btn-export"
+          [class.btn-export--loading]="exporting()"
+          [class.btn-export--success]="exported()"
+          (click)="onExport()"
+          [disabled]="exporting()"
+          aria-label="Export grid image"
+        >
+          @if (exporting()) {
+            <span class="btn-spinner" aria-hidden="true"></span>
+            Preparing…
+          } @else if (exported()) {
+            ✓ Saved!
+          } @else {
+            ↓ Export {{ config().exportFormat.toUpperCase() }}
+          }
+        </button>
+        <p class="field-hint" style="text-align:center; margin-top:8px;">
+          Print at <strong>100% actual size</strong> for accurate measurements
+        </p>
+      </section>
+    </div>
+  </div>
+</aside>

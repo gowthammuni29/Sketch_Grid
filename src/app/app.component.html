@@ -1,0 +1,39 @@
+<div class="app" [class.app--loaded]="loaded()">
+  <!-- Intro loader -->
+  @if (!loaded()) {
+    <div class="splash" aria-label="Loading Sketch Grids" role="status">
+      <div class="splash__logo">
+        <div class="splash__grid" aria-hidden="true">
+          @for (cell of splashCells; track $index) {
+            <div class="splash__cell" [style.animation-delay]="($index * 0.04) + 's'"></div>
+          }
+        </div>
+      </div>
+      <div class="splash__brand">
+        <span class="splash__sketch">Sketch</span><span class="splash__grids">Grids</span>
+      </div>
+      <div class="splash__sub">PROFESSIONAL GRID MAKER</div>
+      <div class="splash__progress">
+        <div class="splash__bar"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Main shell -->
+  @if (loaded()) {
+    <sg-header
+      (exportTriggered)="onExport()"
+      (resetTriggered)="onReset()"
+      #header
+    ></sg-header>
+
+    <div class="app__body">
+      <sg-sidebar
+        (exportRequested)="onExport()"
+        #sidebar
+      ></sg-sidebar>
+
+      <sg-canvas-preview #preview></sg-canvas-preview>
+    </div>
+  }
+</div>

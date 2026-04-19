@@ -1,0 +1,91 @@
+<header class="header" role="banner">
+  <!-- Left: Logo + Brand -->
+  <div class="header__brand">
+    <div class="header__logo" aria-hidden="true">
+      <div class="logo-3d">
+        <div class="logo-face logo-face--front">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="1" y="1" width="9" height="9" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="12" y="1" width="9" height="9" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="1" y="12" width="9" height="9" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="12" y="12" width="9" height="9" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="header__title-group">
+      <h1 class="header__title">
+        <span class="title-sketch">Sketch</span><span class="title-grids">Grids</span>
+      </h1>
+      <p class="header__sub">PROFESSIONAL GRID MAKER</p>
+    </div>
+  </div>
+
+  <!-- Center: Status / Info Bar -->
+  <div class="header__info" aria-live="polite">
+    <div class="info-chip" [class.info-chip--warning]="!geom().fitsW || !geom().fitsH">
+      <span class="info-chip__dot" [class.info-chip__dot--warn]="!geom().fitsW || !geom().fitsH"></span>
+      <span class="info-chip__text">
+        {{ config().cols }}×{{ config().rows }}
+        <span class="info-sep">/</span>
+        {{ config().cellIn }}" cell
+      </span>
+    </div>
+    <div class="info-chip info-chip--page">
+      <span class="info-chip__text">{{ pageDimsLabel }}</span>
+    </div>
+    @if (!geom().fitsW || !geom().fitsH) {
+      <div class="info-chip info-chip--alert" role="alert">
+        <span class="info-chip__text">⚠ Grid exceeds page</span>
+      </div>
+    }
+  </div>
+
+  <!-- Right: Actions -->
+  <div class="header__actions">
+    <!-- Undo / Reset -->
+    <button class="btn-icon" (click)="onReset()" title="Reset to defaults" aria-label="Reset grid to defaults">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 8C2 4.686 4.686 2 8 2c1.9 0 3.6.838 4.763 2.17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M14 8c0 3.314-2.686 6-6 6a5.99 5.99 0 01-4.2-1.702" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M12 1.5v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 10.5v3H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <!-- Install PWA -->
+    @if (installPrompt) {
+      <button class="btn-secondary btn-install" (click)="onInstall()" aria-label="Install Sketch Grids app">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v8M4 6l3 3 3-3M1 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Install App</span>
+      </button>
+    }
+
+    <!-- Export CTA -->
+    <button
+      class="btn-primary"
+      [class.btn-primary--loading]="exporting()"
+      [class.btn-primary--success]="exported()"
+      (click)="onExport()"
+      [disabled]="exporting()"
+      aria-label="Export grid image"
+    >
+      @if (exporting()) {
+        <span class="btn-spinner" aria-hidden="true"></span>
+        <span>Exporting…</span>
+      } @else if (exported()) {
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Saved!</span>
+      } @else {
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M7 1v8M4 6l3 3 3-3M1 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Export {{ config().exportFormat.toUpperCase() }}</span>
+      }
+    </button>
+  </div>
+</header>

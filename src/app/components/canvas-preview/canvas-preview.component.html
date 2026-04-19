@@ -1,0 +1,118 @@
+<main class="preview" role="main" aria-label="Grid preview canvas">
+
+  <!-- ── Toolbar ── -->
+  <div class="preview__toolbar" role="toolbar" aria-label="Preview controls">
+    <div class="toolbar__group">
+      <button class="tool-btn" (click)="zoomOut()" title="Zoom out" aria-label="Zoom out">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M3.5 6h5M10.5 10.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn tool-btn--zoom" (click)="resetZoom()" [attr.aria-label]="'Current zoom: ' + zoomLabel">
+        {{ zoomLabel }}
+      </button>
+      <button class="tool-btn" (click)="zoomIn()" title="Zoom in" aria-label="Zoom in">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M6 3.5v5M3.5 6h5M10.5 10.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="toolbar__divider" aria-hidden="true"></div>
+    <div class="toolbar__info" aria-live="polite">
+      <span class="toolbar__label">PRINT PREVIEW</span>
+      <span class="toolbar__dim">{{ pageLabel }}</span>
+    </div>
+    <div class="toolbar__divider" aria-hidden="true"></div>
+    <div class="toolbar__group">
+      <button class="tool-btn" (click)="toggleRulers()" title="Toggle rulers"
+        [class.tool-btn--active]="showRulers()"
+        [attr.aria-pressed]="showRulers()"
+        aria-label="Toggle rulers">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="0.5" y="3.5" width="13" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M3 3.5V5M5 3.5V6M7 3.5V5M9 3.5V6M11 3.5V5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="tool-btn" (click)="fitToScreen()" title="Fit to screen" aria-label="Fit canvas to screen">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M1 5V1h4M9 1h4v4M13 9v4H9M5 13H1V9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Canvas area ── -->
+  <div class="preview__area" #previewArea
+    (wheel)="onWheel($event)"
+    role="region"
+    aria-label="Canvas preview area"
+  >
+    <!-- Rulers -->
+    @if (showRulers()) {
+      <div class="ruler ruler--h" aria-hidden="true">
+        @for (tick of hTicks; track tick.pos) {
+          <div class="ruler__tick" [style.left.px]="tick.pos">
+            <span class="ruler__label">{{ tick.label }}</span>
+          </div>
+        }
+      </div>
+      <div class="ruler ruler--v" aria-hidden="true">
+        @for (tick of vTicks; track tick.pos) {
+          <div class="ruler__tick" [style.top.px]="tick.pos">
+            <span class="ruler__label">{{ tick.label }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Canvas wrapper with 3D float -->
+    <div class="canvas-wrap" [style.transform]="canvasTransform"
+      [class.canvas-wrap--rulers]="showRulers()">
+      <!-- Page shadow layers -->
+      <div class="page-shadow" aria-hidden="true"></div>
+      <div class="page-shadow page-shadow--2" aria-hidden="true"></div>
+
+      <!-- The canvas -->
+      <canvas
+        #gridCanvas
+        class="grid-canvas"
+        [attr.aria-label]="'Grid preview: ' + config().cols + ' columns by ' + config().rows + ' rows'"
+        role="img"
+      ></canvas>
+
+      <!-- Scan line overlay -->
+      <div class="scan-overlay" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- ── Status bar ── */-->
+  <div class="preview__statusbar" role="status" aria-live="polite">
+    <div class="status-group">
+      <span class="status-key">GRID</span>
+      <span class="status-val">{{ config().cols }}×{{ config().rows }}</span>
+    </div>
+    <div class="status-sep" aria-hidden="true">·</div>
+    <div class="status-group">
+      <span class="status-key">CELL</span>
+      <span class="status-val">{{ config().cellIn }}"</span>
+    </div>
+    <div class="status-sep" aria-hidden="true">·</div>
+    <div class="status-group">
+      <span class="status-key">MARGINS</span>
+      <span class="status-val">{{ config().marginSideIn }}"·{{ config().marginTopIn }}"</span>
+    </div>
+    <div class="status-sep" aria-hidden="true">·</div>
+    <div class="status-group">
+      <span class="status-key">FORMAT</span>
+      <span class="status-val">{{ config().exportFormat.toUpperCase() }}·{{ config().exportDpi }}dpi</span>
+    </div>
+    @if (!geom().fitsW || !geom().fitsH) {
+      <div class="status-sep" aria-hidden="true">·</div>
+      <div class="status-group status-group--warn" role="alert">
+        <span class="status-val">⚠ Grid exceeds page bounds</span>
+      </div>
+    }
+  </div>
+</main>
