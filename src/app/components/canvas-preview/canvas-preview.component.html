@@ -9,8 +9,8 @@
           <path d="M3.5 6h5M10.5 10.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
         </svg>
       </button>
-      <button class="tool-btn tool-btn--zoom" (click)="resetZoom()" [attr.aria-label]="'Current zoom: ' + zoomLabel">
-        {{ zoomLabel }}
+      <button class="tool-btn tool-btn--zoom" (click)="resetZoom()" [attr.aria-label]="'Current zoom: ' + zoomLabel()">
+        {{ zoomLabel() }}
       </button>
       <button class="tool-btn" (click)="zoomIn()" title="Zoom in" aria-label="Zoom in">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -22,7 +22,7 @@
     <div class="toolbar__divider" aria-hidden="true"></div>
     <div class="toolbar__info" aria-live="polite">
       <span class="toolbar__label">PRINT PREVIEW</span>
-      <span class="toolbar__dim">{{ pageLabel }}</span>
+      <span class="toolbar__dim">{{ pageLabel() }}</span>
     </div>
     <div class="toolbar__divider" aria-hidden="true"></div>
     <div class="toolbar__group">
@@ -52,14 +52,14 @@
     <!-- Rulers -->
     @if (showRulers()) {
       <div class="ruler ruler--h" aria-hidden="true">
-        @for (tick of hTicks; track tick.pos) {
+        @for (tick of hTicks(); track tick.pos) {
           <div class="ruler__tick" [style.left.px]="tick.pos">
             <span class="ruler__label">{{ tick.label }}</span>
           </div>
         }
       </div>
       <div class="ruler ruler--v" aria-hidden="true">
-        @for (tick of vTicks; track tick.pos) {
+        @for (tick of vTicks(); track tick.pos) {
           <div class="ruler__tick" [style.top.px]="tick.pos">
             <span class="ruler__label">{{ tick.label }}</span>
           </div>
